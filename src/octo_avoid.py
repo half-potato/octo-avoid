@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import rospy, octomap
+import rospy, octomap, math
 from vradio.msg import Radio
 from octomap_msgs.msg import Octomap
 from octomap_msgs.msg import OctomapWithPose
@@ -16,8 +16,12 @@ def getBoundingBox(octo, x, y, z, ws): #where ws is the width, height, and depth
 #       First, active cells will be reduced by a bounding sphere
 def getBoundingSphere(boundingBox, ws): #where ws is the bounding radius
 #       Then calculate the azimuth and elevation angles for the voxel. These are coordinates. 
-#       azimuth = floor(1/alpha * arctan((xi - x0) / (yi - y0))) where alpha is the resolution of the histogram, xi, yi are the coords of the voxel, and x0, y0 are the vehicle center point
-#       elevation = floor(1/alpha * arctan((zi - z0) / sqrt((xi-x0)**2 + (yi-y0)**2)))
+def coordsToAngles(ox, oy, oz, vx, vy, vz, alpha):
+    az = math.floor(1./alpha * math.atan((vx - ox) / (vy - oy)))
+    #azimuth = floor(1/alpha * arctan((xi - x0) / (yi - y0))) where alpha is the resolution of the histogram, xi, yi are the coords of the voxel, and x0, y0 are the vehicle center point
+    el = math.floor(1./alpha * math.atan((vz - oz) / math.sqrt((vx - ox)**2 + (vy - oy)**2)))
+    #elevation = floor(1/alpha * arctan((zi - z0) / sqrt((xi-x0)**2 + (yi-y0)**2)))
+    return az, el
 #       Use the radius of the robot to enlarge the voxel, this determines the angles
 #       lambda = floor(1/alpha * arcsine((r+s+v)/d)) where r is the robot radius, s is the safety radius, v is the voxel size, d is the distance to the voxel, and lambda is the voxel angle size
 #       l = d - (r+s+v) where l is the minimum distance to the voxel
