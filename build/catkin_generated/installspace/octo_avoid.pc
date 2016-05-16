@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: octo_avoid
+Description: Description of octo_avoid
+Version: 0.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 

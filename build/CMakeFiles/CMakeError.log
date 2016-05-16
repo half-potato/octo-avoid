@@ -1,0 +1,106 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec4256573933/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec4256573933.dir/build.make CMakeFiles/cmTryCompileExec4256573933.dir/build
+make[1]: Entering directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec4256573933.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec4256573933.dir/CheckSymbolExists.c.o   -c /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTryCompileExec4256573933
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec4256573933.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec4256573933.dir/CheckSymbolExists.c.o  -o cmTryCompileExec4256573933 -rdynamic 
+CMakeFiles/cmTryCompileExec4256573933.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec4256573933] Error 1
+make[1]: Leaving directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec4256573933/fast] Error 2
+
+File /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec645471288/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec645471288.dir/build.make CMakeFiles/cmTryCompileExec645471288.dir/build
+make[1]: Entering directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec645471288.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec645471288.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec645471288
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec645471288.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec645471288.dir/CheckFunctionExists.c.o  -o cmTryCompileExec645471288 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec645471288] Error 1
+make[1]: Leaving directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec645471288/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec291582995/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec291582995.dir/build.make CMakeFiles/cmTryCompileExec291582995.dir/build
+make[1]: Entering directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec291582995.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec291582995.dir/CheckSymbolExists.c.o   -c /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTryCompileExec291582995
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec291582995.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec291582995.dir/CheckSymbolExists.c.o  -o cmTryCompileExec291582995 -rdynamic 
+CMakeFiles/cmTryCompileExec291582995.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec291582995] Error 1
+make[1]: Leaving directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec291582995/fast] Error 2
+
+File /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec836064738/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec836064738.dir/build.make CMakeFiles/cmTryCompileExec836064738.dir/build
+make[1]: Entering directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec836064738.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec836064738.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec836064738
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec836064738.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec836064738.dir/CheckFunctionExists.c.o  -o cmTryCompileExec836064738 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: Leaving directory `/home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec836064738] Error 1
+make: *** [cmTryCompileExec836064738/fast] Error 2
+
+

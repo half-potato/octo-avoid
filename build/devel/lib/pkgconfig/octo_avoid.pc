@@ -1,0 +1,8 @@
+prefix=/home/amai/catkin_workspace/src/octo-avoid/build/devel
+
+Name: octo_avoid
+Description: Description of octo_avoid
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/amai/catkin_workspace/src/octo-avoid/build/devel/lib 
+Requires: 
