@@ -7,8 +7,17 @@ from octomap_msgs.msg import OctomapWithPose
 # 5 stages
 #   1st
 #       Explore a bounding box around the vehicle. The location of voxels is not stored to reduce memory.
-def getBoundingBox(octo, x, y, z, ws): #where ws is the width, height, and depth
-    return False
+def getBoundingBox(octo, x, y, z, ws, res, searchDepth): #where ws is the width, height, and depth
+    octom = octomap.OcTree()
+    result = {}
+    for ix in xrange(x-ws/2, x+ws/2, res):
+        result.append({})
+        for iy in xrange(y-ws/2, y+ws/2, res):
+            result.append({})
+            for iz in xrange(z-ws/2, z+ws/2, res):
+                result.append(octom.search([ix, iy, iz], searchDepth).getOccupancy())
+
+    return result
 #   2nd
 #       Add data to the 2d primary polar histogram, this represents a sphere
 #       Determine angle using position of the voxel and vehicle center point
