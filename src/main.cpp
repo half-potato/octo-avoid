@@ -1,33 +1,26 @@
 #include <iostream>
 #include <math.h>
+#include <vector>
 #include <octomap/octomap.h>
 #include <octomap/OcTree.h>
 
 using namespace std;
 using namespace octomap;
 
-void print_query_info(point3d query, OcTreeNode* node) {
-	if (node != NULL) {
-		cout << "occupancy probability at " << query << ":\t " << node->getOccupancy() << endl;
-	}
-	else 
-		cout << "occupancy probability at " << query << ":\t is unknown" << endl;    
-}
-
-typedef vector <vector <vector<OcTreeNode* > > > christmastree;
+typedef vector <vector <vector<double > > > christmastree;
 // 5 stages
 //   1st
 //       Explore a bounding box around the vehicle. The location of voxels is not stored to reduce memory.
-christmastree getBoundingBox(OcTree octo, float x, float y, float z, float ws, float res, int searchDepth) { //where ws is the width, height, and depth
+christmastree getBoundingBox(OcTree octo, double x, double y, double z, double ws, double res, int searchDepth) { //where ws is the width, height, and depth
 	christmastree result;
-	for (float ix=(x-ws/2); ix < (x+ws/2); ix+=res) {
+	for (double ix=(x-ws/2); ix < (x+ws/2); ix+=res) {
 		result.push_back({});
-		for (float iy=(y-ws/2); iy < (y+ws/2); iy+=res) {
+		for (double iy=(y-ws/2); iy < (y+ws/2); iy+=res) {
 			result.back().push_back({});
-			for (float iz=(z-ws/2); iz < (z+ws/2); iz+=res) {
+			for (double iz=(z-ws/2); iz < (z+ws/2); iz+=res) {
 				point3d point(ix, iy, iz);
 				OcTreeNode* node = octo.search(point, searchDepth);
-				result.back().back().push_back(node);
+				result.back().back().push_back(node->getOccupancy());
 			}
 		}
 	}
@@ -38,30 +31,60 @@ christmastree getBoundingBox(OcTree octo, float x, float y, float z, float ws, f
 //       Determine angle using position of the voxel and vehicle center point
 //       Two angles will determine range, weight will determine height
 //       First, active cells will be reduced by a bounding sphere
-christmastree getBoundingSphere(christmastree boundingBox, float ws, float ocTreeNodeWidth) { //where ws is the bounding radius
+//       ocTreeNodeWidth should be the res in the first function
+christmastree getBoundingSphere(christmastree boundingBox, double ws, double voxelSize) { //where ws is the bounding radius
+	christmastree result;
 	for (int x=0; x<int(boundingBox.size()); x++) {
+		result.push_back({});
 		for (int y=0; y<int(boundingBox.size()); y++) {
+			result.back().push_back({});
 			for (int z=0; z<int(boundingBox.size()); z++) {
-
+				double dist = sqrt(pow(x*voxelSize, 2) + pow(y*voxelSize, 2) + pow(z*voxelSize, 2));
+				if (dist > ws) { 
+					result.back().back().push_back(0.0f);
+				} else {
+					result.back().back().push_back(boundingBox.at(x).at(y).at(z));
+				}
 			}
 		}
 	}
+	return result;
 }
 //       Then calculate the azimuth and elevation angles for the voxel. These are coordinates. 
-def coordsToAngles(ox, oy, oz, vx, vy, vz, alpha):
-    az = math.floor(1./alpha * math.atan((vx - ox) / (vy - oy)))
+double* coordsToAngles(double ox, double oy, double oz, double vx, double vy, double vz, double alpha) {
+	static double result[2] = {};
     //azimuth = floor(1/alpha * arctan((xi - x0) / (yi - y0))) where alpha is the resolution of the histogram, xi, yi are the coords of the voxel, and x0, y0 are the vehicle center point
-    el = math.floor(1./alpha * math.atan((vz - oz) / math.sqrt((vx - ox)**2 + (vy - oy)**2)))
+    result[0] = floor(1.0/alpha * atan((vx - ox) / (vy - oy)));
     //elevation = floor(1/alpha * arctan((zi - z0) / sqrt((xi-x0)**2 + (yi-y0)**2)))
-    return az, el
+    result[1] = floor(1.0/alpha * atan((vz - oz) / sqrt(pow(vx - ox, 2) + pow(vy - oy, 2))));
+    return result;
+}
 //       Use the radius of the robot to enlarge the voxel, this determines the angles
 //       lambda = floor(1/alpha * arcsine((r+s+v)/d)) where r is the robot radius, s is the safety radius, v is the voxel size, d is the distance to the voxel, and lambda is the voxel angle size
 //       l = d - (r+s+v) where l is the minimum distance to the voxel
-//       a-b((ws-1)/2)**2 = 1 //ratio for the weights
+christmastree enlarge(christmastree data, double robotRadius, double safetyRadius, double voxelSize) {
+	christmastree result;
+	for (int x=0; x<int(data.size()); x++) {
+		result.push_back({});
+		for (int y=0; y<int(data.size()); y++) {
+			result.back().push_back({});
+			for (int z=0; z<int(data.size()); z++) {
+				double dist = sqrt(pow(x*voxelSize, 2) + pow(y*voxelSize, 2) + pow(z*voxelSize, 2));
+			}
+		}
+	}
+	return result;
+}
+//       a-b((ws-1)/2)**2 = 1 //ratio for the histogram
 //       histogram(e,z) = SUM(if (e is a component of [elevation-lambda/alpha, elevation+lambda/alpha] and z is a component of [azimuth-lambda/alpha, azimuth+lambda/alpha] then 
 //                       eo**2 * (a-b*l) 
 //                    else
 //                       0))
+christmastree flattenToHistogram(christmastree data) {
+	christmastree histogram;
+	histogram = data;
+	return histogram;
+}
 //   3rd stage
 //       Adding more voxels to include the turning circle
 //       First, calculate the origins of the turning circles
@@ -106,13 +129,15 @@ def coordsToAngles(ox, oy, oz, vx, vy, vz, alpha):
 
 int main() {
 	OcTree tree("fr_campus.bt");
+	christmastree wild = getBoundingBox(tree, 0.0, 0.0, 0.0, 20.0, 1.0, 16);
+	christmastree trimmed = getBoundingSphere(wild, 20.0, 1);
 	for (int x=-30.0; x < 30.0; x+=2) {
 		for (int y=-30.0; y < 30.0; y+=2) {
 			for (int z=-30.0; z < 30.0; z+=2) {
-				//point3d endpoint((float) x*0.05f, (float) y*0.05f, (float) z*0.05f);
+				//point3d endpoint((double) x*0.05f, (double) y*0.05f, (double) z*0.05f);
 				//tree.updateNode(endpoint, true);
-				float res = 0.2f;
-				point3d query ((float)x*res, (float)y*res, (float)z*res);
+				double res = 0.2f;
+				point3d query ((double)x*res, (double)y*res, (double)z*res);
 				OcTreeNode* result = tree.search(query, 16);
 				//print_query_info(query, result);
 				if (result!=NULL) { 
@@ -125,5 +150,4 @@ int main() {
 		}
 		cout << endl;
 	}
-	cout << "Hello world" << endl;
 }
