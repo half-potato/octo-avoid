@@ -32,14 +32,14 @@ christmastree getBoundingBox(OcTree octo, double x, double y, double z, double w
 //       Two angles will determine range, weight will determine height
 //       First, active cells will be reduced by a bounding sphere
 //       ocTreeNodeWidth should be the res in the first function
-christmastree getBoundingSphere(christmastree boundingBox, double ws, double voxelSize) { //where ws is the bounding radius
+christmastree getBoundingSphere(christmastree boundingBox, double ws, double voxelSize) { //where ws is the bounding radius in the same units as voxel size
 	christmastree result;
 	for (int x=0; x<int(boundingBox.size()); x++) {
 		result.push_back({});
 		for (int y=0; y<int(boundingBox.size()); y++) {
 			result.back().push_back({});
 			for (int z=0; z<int(boundingBox.size()); z++) {
-				double dist = sqrt(pow(x*voxelSize, 2) + pow(y*voxelSize, 2) + pow(z*voxelSize, 2));
+				double dist = sqrt(pow((x - result.size())*voxelSize, 2) + pow((y - result.back().size())*voxelSize, 2) + pow((z - result.back().back().size())*voxelSize, 2));
 				if (dist > ws) { 
 					result.back().back().push_back(0.0f);
 				} else {
@@ -62,24 +62,43 @@ double* coordsToAngles(double ox, double oy, double oz, double vx, double vy, do
 //       Use the radius of the robot to enlarge the voxel, this determines the angles
 //       lambda = floor(1/alpha * arcsine((r+s+v)/d)) where r is the robot radius, s is the safety radius, v is the voxel size, d is the distance to the voxel, and lambda is the voxel angle size
 //       l = d - (r+s+v) where l is the minimum distance to the voxel
-christmastree enlarge(christmastree data, double robotRadius, double safetyRadius, double voxelSize) {
-	christmastree result;
+struct VoxelInfo {
+	public:
+		double dist;
+		double lambda;
+		double az;
+		double el;
+		VoxelInfo(double dist, double lambda, double az, double el) : dist(dist), lambda(lambda), az(az), el(el) {}
+};
+
+vector <vector <double> > primaryHistogram(christmastree data, double robotRadius, double safetyRadius, double voxelSize, double alpha, double ws) {
+//	a-b((ws-1)/2)**2 = 1 //ratio for the histogram, only the ratio matters
+	double b = 5;
+	double a = 1 + b*pow( (ws-1) / 2, 2);
+	vector <vector <double> > histogram;
+	vector <vector <vector <VoxelInfo> > > pregened;
+	//Pregen data
 	for (int x=0; x<int(data.size()); x++) {
-		result.push_back({});
+		pregened.push_back({});
 		for (int y=0; y<int(data.size()); y++) {
-			result.back().push_back({});
+			pregened.back().push_back({});
 			for (int z=0; z<int(data.size()); z++) {
-				double dist = sqrt(pow(x*voxelSize, 2) + pow(y*voxelSize, 2) + pow(z*voxelSize, 2));
+				double dist = sqrt(pow((x - data.size())*voxelSize, 2) + pow((y - data.back().size())*voxelSize, 2) + pow((z - data.back().back().size())*voxelSize, 2));
+				double lambda = floor(1/alpha * asin((robotRadius+safetyRadius+voxelSize)/dist));
+				double *coords = coordsToAngles(0, 0, 0, x*voxelSize, y*voxelSize, z*voxelSize, alpha);
+				double az = coords[0];
+				double el = coords[1];
+				VoxelInfo info(dist, lambda, az, el);
+				pregened.back().back().push_back(info);
 			}
 		}
 	}
-	return result;
-}
-//       a-b((ws-1)/2)**2 = 1 //ratio for the histogram
-//       histogram(e,z) = SUM(if (e is a component of [elevation-lambda/alpha, elevation+lambda/alpha] and z is a component of [azimuth-lambda/alpha, azimuth+lambda/alpha] then 
+//  histogram(e,z) = SUM(if (e is a component of [elevation-lambda/alpha, elevation+lambda/alpha] and z is a component of [azimuth-lambda/alpha, azimuth+lambda/alpha] then 
 //                       eo**2 * (a-b*l) 
 //                    else
 //                       0))
+	return histogram;
+}
 christmastree flattenToHistogram(christmastree data) {
 	christmastree histogram;
 	histogram = data;
