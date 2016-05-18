@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/amai/catkin_workspace/src/octo-avoid
+CMAKE_SOURCE_DIR = /home/amai/catkin_workspace/src/octo_avoid
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/amai/catkin_workspace/src/octo-avoid/build
+CMAKE_BINARY_DIR = /home/amai/catkin_workspace/src/octo_avoid/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/example.dir/depend.make
@@ -51,17 +51,17 @@ include CMakeFiles/example.dir/flags.make
 
 CMakeFiles/example.dir/src/simple_example.cpp.o: CMakeFiles/example.dir/flags.make
 CMakeFiles/example.dir/src/simple_example.cpp.o: ../src/simple_example.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/amai/catkin_workspace/src/octo_avoid/build/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/example.dir/src/simple_example.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/example.dir/src/simple_example.cpp.o -c /home/amai/catkin_workspace/src/octo-avoid/src/simple_example.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/example.dir/src/simple_example.cpp.o -c /home/amai/catkin_workspace/src/octo_avoid/src/simple_example.cpp
 
 CMakeFiles/example.dir/src/simple_example.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/example.dir/src/simple_example.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/amai/catkin_workspace/src/octo-avoid/src/simple_example.cpp > CMakeFiles/example.dir/src/simple_example.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/amai/catkin_workspace/src/octo_avoid/src/simple_example.cpp > CMakeFiles/example.dir/src/simple_example.cpp.i
 
 CMakeFiles/example.dir/src/simple_example.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/example.dir/src/simple_example.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/amai/catkin_workspace/src/octo-avoid/src/simple_example.cpp -o CMakeFiles/example.dir/src/simple_example.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/amai/catkin_workspace/src/octo_avoid/src/simple_example.cpp -o CMakeFiles/example.dir/src/simple_example.cpp.s
 
 CMakeFiles/example.dir/src/simple_example.cpp.o.requires:
 .PHONY : CMakeFiles/example.dir/src/simple_example.cpp.o.requires
@@ -116,6 +116,6 @@ CMakeFiles/example.dir/clean:
 .PHONY : CMakeFiles/example.dir/clean
 
 CMakeFiles/example.dir/depend:
-	cd /home/amai/catkin_workspace/src/octo-avoid/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/amai/catkin_workspace/src/octo-avoid /home/amai/catkin_workspace/src/octo-avoid /home/amai/catkin_workspace/src/octo-avoid/build /home/amai/catkin_workspace/src/octo-avoid/build /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/example.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/amai/catkin_workspace/src/octo_avoid/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/amai/catkin_workspace/src/octo_avoid /home/amai/catkin_workspace/src/octo_avoid /home/amai/catkin_workspace/src/octo_avoid/build /home/amai/catkin_workspace/src/octo_avoid/build /home/amai/catkin_workspace/src/octo_avoid/build/CMakeFiles/example.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/example.dir/depend
 

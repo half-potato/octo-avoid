@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/amai/catkin_workspace/src/octo-avoid
+CMAKE_SOURCE_DIR = /home/amai/catkin_workspace/src/octo_avoid
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/amai/catkin_workspace/src/octo-avoid/build
+CMAKE_BINARY_DIR = /home/amai/catkin_workspace/src/octo_avoid/build
 
 # Utility rule file for run_tests.
 
@@ -60,6 +60,6 @@ CMakeFiles/run_tests.dir/clean:
 .PHONY : CMakeFiles/run_tests.dir/clean
 
 CMakeFiles/run_tests.dir/depend:
-	cd /home/amai/catkin_workspace/src/octo-avoid/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/amai/catkin_workspace/src/octo-avoid /home/amai/catkin_workspace/src/octo-avoid /home/amai/catkin_workspace/src/octo-avoid/build /home/amai/catkin_workspace/src/octo-avoid/build /home/amai/catkin_workspace/src/octo-avoid/build/CMakeFiles/run_tests.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/amai/catkin_workspace/src/octo_avoid/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/amai/catkin_workspace/src/octo_avoid /home/amai/catkin_workspace/src/octo_avoid /home/amai/catkin_workspace/src/octo_avoid/build /home/amai/catkin_workspace/src/octo_avoid/build /home/amai/catkin_workspace/src/octo_avoid/build/CMakeFiles/run_tests.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/run_tests.dir/depend
 

@@ -67,8 +67,8 @@ set(octo_avoid_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(octo_avoid_SOURCE_PREFIX /home/amai/catkin_workspace/src/octo-avoid)
-  set(octo_avoid_DEVEL_PREFIX /home/amai/catkin_workspace/src/octo-avoid/build/devel)
+  set(octo_avoid_SOURCE_PREFIX /home/amai/catkin_workspace/src/octo_avoid)
+  set(octo_avoid_DEVEL_PREFIX /home/amai/catkin_workspace/src/octo_avoid/build/devel)
   set(octo_avoid_INSTALL_PREFIX "")
   set(octo_avoid_PREFIX ${octo_avoid_DEVEL_PREFIX})
 else()

@@ -20,6 +20,10 @@ catkin_package(
 find_package(octomap REQUIRED)
 include_directories(${OCTOMAP_INCLUDE_DIRS})
 
+find_package(ROOT REQUIRED COMPONENTS RIO Net)
+include(${ROOT_USE_FILE})
+include_directories(${ROOT_INCLUDE_DIRS})
+
 #########
 ## ROS ##
 #########
@@ -39,6 +43,7 @@ add_executable(octo_avoid src/main.cpp)
 target_link_libraries(octo_avoid ${OCTOMAP_LIBRARIES} ${CATKIN_LIBRARIES})
 target_link_libraries(octo_avoid ${CATKIN_LIBRARIES})
 target_link_libraries(octo_avoid ${roscpp_LIBRARIES})
+target_link_libraries(octo_avoid ${ROOT_LIBRARIES})
 add_executable(example src/simple_example.cpp)
 target_link_libraries(example ${OCTOMAP_LIBRARIES})
 target_link_libraries(example ${CATKIN_LIBRARIES})

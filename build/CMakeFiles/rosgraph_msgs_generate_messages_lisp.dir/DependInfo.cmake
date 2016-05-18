@@ -17,6 +17,7 @@ SET(CMAKE_TARGET_LINKED_INFO_FILES
 SET(CMAKE_C_TARGET_INCLUDE_PATH
   "/home/amai/catkin_workspace/devel/include"
   "/opt/ros/indigo/include"
+  "/usr/local/include"
   )
 SET(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
 SET(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})

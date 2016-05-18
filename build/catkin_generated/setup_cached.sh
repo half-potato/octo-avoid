@@ -7,9 +7,8 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/amai/catkin_workspace/src/octo-avoid/build/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/amai/catkin_workspace/src/octo-avoid/build/devel/lib:/home/amai/catkin_workspace/devel/lib:/opt/ros/indigo/lib"
-export PATH="/opt/ros/indigo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-export PKG_CONFIG_PATH="/home/amai/catkin_workspace/src/octo-avoid/build/devel/lib/pkgconfig:/home/amai/catkin_workspace/devel/lib/pkgconfig:/opt/ros/indigo/lib/pkgconfig"
-export ROSLISP_PACKAGE_DIRECTORIES="/home/amai/catkin_workspace/src/octo-avoid/build/devel/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/home/amai/catkin_workspace/src/octo-avoid:/home/amai/catkin_workspace/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks"
+export CMAKE_PREFIX_PATH="/home/amai/catkin_workspace/src/octo_avoid/build/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/amai/catkin_workspace/src/octo_avoid/build/devel/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/amai/catkin_workspace/src/octo_avoid/build/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
+export ROSLISP_PACKAGE_DIRECTORIES="/home/amai/catkin_workspace/src/octo_avoid/build/devel/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
+export ROS_PACKAGE_PATH="/home/amai/catkin_workspace/src/octo_avoid:/home/amai/catkin_workspace/src:/opt/ros/indigo/share:/opt/ros/indigo/stacks"

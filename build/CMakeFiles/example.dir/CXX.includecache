@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/amai/catkin_workspace/src/octo-avoid/src/simple_example.cpp
+/home/amai/catkin_workspace/src/octo_avoid/src/simple_example.cpp
 octomap/octomap.h
 -
 octomap/OcTree.h
