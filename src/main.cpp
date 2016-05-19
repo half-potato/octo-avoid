@@ -188,11 +188,13 @@ void graph(vector< vector<double> > histogram, const char *name) {
 	hist->Draw("Col2");
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+	ros::init(argc, argv, "octo_avoid");
 	ros::NodeHandle n;
 	string filename;
 	n.getParam("octomap", filename);
-	OcTree tree(filename);
+	cout << "Filename: " << filename << endl;
+	OcTree tree(filename + ".bt");
 	christmastree wild = getBoundingBox(tree, 0.0, 0.0, 0.0, 20.0, 1.0, 16);
 	christmastree trimmed = getBoundingSphere(wild, 20.0, 1);
 	vector <vector <double> > histogram = primaryHistogram(trimmed, 3.0, 2.0, 1.0, M_PI/6, 20.0);
