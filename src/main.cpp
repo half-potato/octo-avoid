@@ -3,46 +3,79 @@
 #include <vector>
 #include <octomap/octomap.h>
 #include <octomap/OcTree.h>
-#include <TCanvas.h>
-#include <TH2.h>
 #include <ros/ros.h>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 using namespace octomap;
 
-typedef vector <vector <vector<double > > > christmastree;
+struct VoxelInfo {
+	public:
+		double x; // absolute, not relative coordinates
+		double y;
+		double dist;	// Distance
+		double lambda;	// Angle size
+		double az;	// Azimuth
+		double el;	// Elevation
+		double oc;	// Occupancy certanity
+		double l;	// Minimum distance to voxel
+		VoxelInfo(double x, double y, double dist, double lambda, double az, double el, double oc, double l) : x(x), y(y), dist(dist), lambda(lambda), az(az), el(el), oc(oc), l(l) {}
+		~VoxelInfo() {}
+};
+
+typedef vector< VoxelInfo > VoxelList;
+typedef vector<vector<vector<double>>> christmastree;
+
 // 5 stages
 //   1st
 //       Explore a bounding box around the vehicle. The location of voxels is not stored to reduce memory.
-christmastree getBoundingBox(OcTree octo, double x, double y, double z, double ws, double res, int searchDepth) { //where ws is the width, height, and depth
+VoxelList exploreBox(OcTree octo, cv::Point3d origin, double ws) {
+	VoxelList list;
+	for (auto i = octo.begin(1); i != octo.end(); ++i) {
+		cout << i->getOccupancy() << endl;
+		if(i->getOccupancy() > 0) {
+		}
+	}
+	return list;
+}
+christmastree getBoundingBox(OcTree octo, cv::Point3d origin, double ws, int searchDepth) { //where ws is the width, height, and depth
+	exploreBox(octo, origin, ws);
 	christmastree result;
-	for (double ix=(x-ws/2); ix < (x+ws/2); ix+=res) {
+	double res = octo.getTreeDepth() / searchDepth;
+	for (double ix=(origin.x-ws/2); ix < (origin.x+ws/2); ix+=res) {
 		result.push_back({});
-		for (double iy=(y-ws/2); iy < (y+ws/2); iy+=res) {
+		for (double iy=(origin.y-ws/2); iy < (origin.y+ws/2); iy+=res) {
 			result.back().push_back({});
-			for (double iz=(z-ws/2); iz < (z+ws/2); iz+=res) {
+			for (double iz=(origin.z-ws/2); iz < (origin.z+ws/2); iz+=res) {
 				point3d point(ix, iy, iz);
 				OcTreeNode* node = octo.search(point, searchDepth);
-				result.back().back().push_back(node->getOccupancy());
+				if (node != NULL) {
+					result.back().back().push_back(node->getOccupancy());
+				} else {
+					result.back().back().push_back(0.0);
+				}
 			}
 		}
 	}
 	return result;
 }
+
 //   2nd
 //       Add data to the 2d primary polar histogram, this represents a sphere
 //       Determine angle using position of the voxel and vehicle center point
 //       Two angles will determine range, weight will determine height
 //       First, active cells will be reduced by a bounding sphere
 //       ocTreeNodeWidth should be the res in the first function
-christmastree getBoundingSphere(christmastree boundingBox, double ws, double voxelSize) { //where ws is the bounding radius in the same units as voxel size
+christmastree getBoundingSphere(christmastree boundingBox, double ws) { //where ws is the bounding radius in the same units as voxel size
 	christmastree result;
 	for (int x=0; x<int(boundingBox.size()); x++) {
 		result.push_back({});
 		for (int y=0; y<int(boundingBox.back().size()); y++) {
 			result.back().push_back({});
 			for (int z=0; z<int(boundingBox.back().back().size()); z++) {
-				double dist = sqrt(pow((x - result.size())*voxelSize, 2) + pow((y - result.back().size())*voxelSize, 2) + pow((z - result.back().back().size())*voxelSize, 2));
+				double dist = sqrt(pow((x - result.size()/2), 2) + pow((y - result.back().size()/2), 2) + pow((z - result.back().back().size()), 2));
 				if (dist > ws) { 
 					result.back().back().push_back(0.0f);
 				} else {
@@ -67,17 +100,6 @@ double* coordsToAngles(double ox, double oy, double oz, double vx, double vy, do
 // Use the radius of the robot to enlarge the voxel, this determines the angles
 // lambda = floor(1/alpha * arcsine((r+s+v)/d)) where r is the robot radius, s is the safety radius, v is the voxel size, d is the distance to the voxel, and lambda is the voxel angle size
 // l = d - (r+s+v) where l is the minimum distance to the voxel
-struct VoxelInfo {
-	public:
-		double dist;	// Distance
-		double lambda;	// Angle size
-		double az;	// Azimuth
-		double el;	// Elevation
-		double oc;	// Occupancy certanity
-		double l;	// Minimum distance to voxel
-		VoxelInfo(double dist, double lambda, double az, double el, double oc, double l) : dist(dist), lambda(lambda), az(az), el(el), oc(oc), l(l) {}
-		~VoxelInfo() {}
-};
 
 vector <vector <double> > primaryHistogram(christmastree data, double robotRadius, double safetyRadius, double voxelSize, double alpha, double ws) {
 	// a-b((ws-1)/2)**2 = 1 //ratio for the histogram, only the ratio matters
@@ -97,7 +119,7 @@ vector <vector <double> > primaryHistogram(christmastree data, double robotRadiu
 				double az = coords[0];
 				double el = coords[1];
 				double l = dist - (robotRadius+safetyRadius+voxelSize);
-				VoxelInfo info(dist, lambda, az, el, data.at(x).at(y).at(z), l);
+				VoxelInfo info(0,0, dist, lambda, az, el, data.at(x).at(y).at(z), l);
 				pregened.back().back().push_back(info);
 			}
 		}
@@ -170,7 +192,7 @@ vector <vector <double> > primaryHistogram(christmastree data, double robotRadiu
 //               The third is the difference between the last path direction and the current one
 //               A vector u is used to select the desired path (u1, u2, u3)
 //               ki = u1*delta(v, kt) + u2*delta(v, theta/alpha) + u3*delta(v, k_(i-1)) where v is the candidate direction, theta is the rotation of the robot, the previous direction is k_(i-1), and the target angle is k_t
-
+/*
 void graph(vector< vector<double> > histogram, const char *name) {
 	TCanvas canvas(name, "Histogram", 500, 500);
 	Double_t rmax(1.);
@@ -186,36 +208,51 @@ void graph(vector< vector<double> > histogram, const char *name) {
 	TH2D *dummy = new TH2D("dummy", name, 100, -rmax, rmax, 100, -rmax, rmax);
 	dummy->Draw("Col");
 	hist->Draw("Col2");
+	cout << "Displaying" << endl;
+}*/
+
+void graph(vector< vector<double> > histogram, const char *name, int width, int height) {
+	cv::Mat background = cv::Mat::zeros(width, height, CV_8UC3);
+	double r_width = width / (double) histogram.size();
+	double r_height = height / (double) histogram.back().size();
+	for (int x=0; x<(int)histogram.size(); x++) {
+		for (int y=0; y<(int)histogram.back().size(); y++) {
+			cv::Point pt1(x*r_width, y*r_height);
+			cv::Point pt2(x*r_width + r_width, y*r_height + r_height);
+			int c = histogram.at(x).at(y) * 255;
+			cv::rectangle(background, pt1, pt2, cv::Scalar(c, c, c), -1);
+		}
+	}
+	for(;;)
+	{
+		cv::imshow(name, background);
+		if(cv::waitKey(30) >=0) break;
+	}
+}
+
+void vPrint(christmastree v) {
+	for (int x=0; x<int(v.size()); x++) {
+		for (int y=0; y<int(v.back().size()); y++) {
+			for (int z=0; z<int(v.back().back().size()); z++) {
+				cout << v.at(x).at(y).at(z);
+			}
+			cout << endl;
+		}
+		cout << "x";
+	}
 }
 
 int main(int argc, char* argv[]) {
 	ros::init(argc, argv, "octo_avoid");
-	ros::NodeHandle n;
+	ros::NodeHandle n("~");
 	string filename;
 	n.getParam("octomap", filename);
-	cout << "Filename: " << filename << endl;
 	OcTree tree(filename + ".bt");
-	christmastree wild = getBoundingBox(tree, 0.0, 0.0, 0.0, 20.0, 1.0, 16);
-	christmastree trimmed = getBoundingSphere(wild, 20.0, 1);
-	vector <vector <double> > histogram = primaryHistogram(trimmed, 3.0, 2.0, 1.0, M_PI/6, 20.0);
-	graph(histogram, "Primary histogram");
-	for (int x=-30.0; x < 30.0; x+=2) {
-		for (int y=-30.0; y < 30.0; y+=2) {
-			for (int z=-30.0; z < 30.0; z+=2) {
-				//point3d endpoint((double) x*0.05f, (double) y*0.05f, (double) z*0.05f);
-				//tree.updateNode(endpoint, true);
-				double res = 0.2f;
-				point3d query ((double)x*res, (double)y*res, (double)z*res);
-				OcTreeNode* result = tree.search(query, 16);
-				//print_query_info(query, result);
-				if (result!=NULL) { 
-					printf("%f, ", result->getOccupancy());
-				} else {
-					cout << "NULL, ";
-				}
-			}
-			cout << "\t";
-		}
-		cout << endl;
-	}
+	cv::Point3d origin(-100.0, 0.0, 0.0);
+	double ws = 100.0;
+	christmastree wild = getBoundingBox(tree, origin, ws, 1);
+	christmastree trimmed = getBoundingSphere(wild, ws);
+	//vPrint(trimmed);
+	vector <vector <double> > histogram = primaryHistogram(wild, 3.0, 2.0, 1.0, M_PI/6, ws);
+	graph(histogram, "Primary histogram", 1000, 600);
 }

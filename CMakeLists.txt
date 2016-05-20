@@ -20,9 +20,17 @@ catkin_package(
 find_package(octomap REQUIRED)
 include_directories(${OCTOMAP_INCLUDE_DIRS})
 
-find_package(ROOT REQUIRED COMPONENTS RIO Net)
-include(${ROOT_USE_FILE})
-include_directories(${ROOT_INCLUDE_DIRS})
+find_package(OpenCV REQUIRED)
+include_directories(${OPENCV_INCLUDE_DIRS})
+
+#find_package(ROOT REQUIRED COMPONENTS RIO Net)
+#include(${ROOT_USE_FILE})
+#include_directories(${ROOT_INCLUDE_DIRS})
+
+add_definitions(
+	-Wall
+	-std=c++11
+)
 
 #########
 ## ROS ##
@@ -39,11 +47,15 @@ include_directories(${roscpp_INCLUDE_DIRS})
 #   std_msgs  # Or other packages containing msgs
 # )
 
+set(ALL_LIBS
+	${OCTOMAP_LIBRARIES}
+	${CATKIN_LIBRARIES}
+	${roscpp_LIBRARIES}
+	${OpenCV_LIBS}
+	)
+
 add_executable(octo_avoid src/main.cpp)
-target_link_libraries(octo_avoid ${OCTOMAP_LIBRARIES} ${CATKIN_LIBRARIES})
-target_link_libraries(octo_avoid ${CATKIN_LIBRARIES})
-target_link_libraries(octo_avoid ${roscpp_LIBRARIES})
-target_link_libraries(octo_avoid ${ROOT_LIBRARIES})
+target_link_libraries(octo_avoid ${ALL_LIBS})
 add_executable(example src/simple_example.cpp)
 target_link_libraries(example ${OCTOMAP_LIBRARIES})
 target_link_libraries(example ${CATKIN_LIBRARIES})
