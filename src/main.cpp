@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
 	double ws = 100.0;
 	christmastree wild = getBoundingBox(tree, origin, ws, 1);
 	christmastree trimmed = getBoundingSphere(wild, ws);
-	//vPrint(trimmed);
-	vector <vector <double> > histogram = primaryHistogram(wild, 3.0, 2.0, 1.0, M_PI/6, ws);
+	vPrint(trimmed);
+	vector <vector <double> > histogram = primaryHistogram(wild, 1.0, 1.0, 1.0 /* v/m */, M_PI/18, ws);
 	graph(histogram, "Primary histogram", 1000, 600);
 }
