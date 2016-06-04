@@ -77,7 +77,7 @@ VoxelList exploreSphere(OcTree octo, cv::Point3d origin, double ws, int depth) {
 			if(i->getOccupancy() > 0) {
 				double x = i.getX(), y = i.getY(), z = i.getZ();
 				double dist = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
-				if (dist < ws) {
+				if (dist < ws/2) {
 					VoxelInfo v(x, y, z, dist, i->getOccupancy());
 					v.voxelSize = i.getSize();
 					list.push_back(v);
@@ -85,6 +85,7 @@ VoxelList exploreSphere(OcTree octo, cv::Point3d origin, double ws, int depth) {
 			}
 		}
 	}
+	cout << "Finished" << endl;
 	return list;
 }
 // Alpha is the maximum angle that would remain in the same cell of the histogram in radians
@@ -93,42 +94,53 @@ VoxelList exploreSphere(OcTree octo, cv::Point3d origin, double ws, int depth) {
 // l = d - (r+s+v) where l is the minimum distance to the voxel
 
 vector <vector <double> > primaryHistogram(VoxelList *data, double robotRadius, double safetyRadius, double alpha, double ws, cv::Point3d origin) {
-	// a-b((ws-1)/2)**2 = 1 //ratio for the histogram, only the ratio matters
-	double b = 5;
-	double a = 1 + b*pow( (ws-1) / 2, 2);
-	cout << "b: " << b << "a: " << a << endl;
-	cout << 1/alpha << endl;
 	vector <vector <double> > histogram;
 	int eres = (int)ceil(M_PI_2 / alpha);
 	int zres = (int)ceil(M_PI_2 / alpha);
-	//Pregen data
-	for (auto i=data->begin(); i!=data->end(); ++i) {
-		i->l = i->dist - (robotRadius+safetyRadius+i->voxelSize);
-		i->lambda = (1/alpha * asin((robotRadius+safetyRadius+i->voxelSize)/i->dist));
-		cv::Point2d cds = coordsToAngles(origin.x, origin.y, origin.z, i->x, i->y, i->z, alpha);
-		i->az = cds.x;
-		i->el = cds.y;
-		//i->lambda = 
-		//cout << 1/alpha * asin((robotRadius+safetyRadius+i->voxelSize)/i->dist) << endl;
-	}
-	//  histogram(e,z) = SUM(if (e is a component of [elevation-lambda/alpha, elevation+lambda/alpha] and z is a component of [azimuth-lambda/alpha, azimuth+lambda/alpha] then 
-	//                       eo**2 * (a-b*l) 
-	//                    else
-	//                       0))
-	cout << (a - b*data->back().l) << endl;;
-	for (int z=0; z<zres; z++) {
-		histogram.push_back({});
-		for (int e=0; e<eres; e++) {
-			// implement histogram(e, z)
-			double sum = 0;
-			for (auto i=data->begin(); i!=data->end(); ++i) {
-				//Figure out if this voxel lies within this cell
-				if(( (e > (i->el - i->lambda / alpha)) && (e < (i->el + i->lambda / alpha)) ) &&
-				   ( (z > (i->az - i->lambda / alpha)) && (z < (i->az + i->lambda / alpha)) ) ) {
-					sum += pow(i->oc, 2);// * (a - b*i->l);	// Add weight
-				} // Essentially add 0
+	if(data->size() > 0) {
+		// a-b((ws-1)/2)**2 = 1 //ratio for the histogram, only the ratio matters
+		double b = 5;
+		double a = 1 + b*pow( (ws-1) / 2, 2);
+		cout << "b: " << b << "a: " << a << endl;
+		cout << 1/alpha << endl;
+		//Pregen data
+		for (auto i=data->begin(); i!=data->end(); ++i) {
+			i->l = i->dist - (robotRadius+safetyRadius+i->voxelSize);
+			i->lambda = floor(1/alpha * asin((robotRadius+safetyRadius+i->voxelSize)/i->dist));
+			cv::Point2d cds = coordsToAngles(origin.x, origin.y, origin.z, i->x, i->y, i->z, alpha);
+			i->az = cds.x;
+			i->el = cds.y;
+			cout << i->lambda << endl;
+			//i->lambda = 
+			//cout << 1/alpha * asin((robotRadius+safetyRadius+i->voxelSize)/i->dist) << endl;
+		}
+		//  histogram(e,z) = SUM(if (e is a component of [elevation-lambda/alpha, elevation+lambda/alpha] and z is a component of [azimuth-lambda/alpha, azimuth+lambda/alpha] then 
+		//                       eo**2 * (a-b*l) 
+		//                    else
+		//                       0))
+		cout << (a - b*data->back().l) << endl;
+		cout << "Pushing" << endl;
+		for (int z=0; z<zres; z++) {
+			histogram.push_back({});
+			for (int e=0; e<eres; e++) {
+				// implement histogram(e, z)
+				double sum = 0;
+				for (auto i=data->begin(); i!=data->end(); ++i) {
+					//Figure out if this voxel lies within this cell
+					if(( (e > (i->el - i->lambda / alpha)) && (e < (i->el + i->lambda / alpha)) ) &&
+					   ( (z > (i->az - i->lambda / alpha)) && (z < (i->az + i->lambda / alpha)) ) ) {
+						sum += pow(i->oc, 2);// * (a - b*i->l);	// Add weight
+					} // Essentially add 0
+				}
+				histogram.back().push_back(sum);
 			}
-			histogram.back().push_back(sum);
+		}
+	} else {
+		for (int z=0; z<zres; z++) {
+			histogram.push_back({});
+			for (int e=0; e<eres; e++) {
+				histogram.back().push_back(0);
+			}
 		}
 	}
 	return histogram;
@@ -193,22 +205,24 @@ void graph(vector< vector<double> > histogram, const char *name) {
 }*/
 
 void graph(vector< vector<double> > histogram, const char *name, int width, int height) {
-	cv::Mat background = cv::Mat::zeros(width, height, CV_8UC3);
-	double r_width = width / (double) histogram.size();
-	double r_height = height / (double) histogram.back().size();
-	for (int x=0; x<(int)histogram.size(); x++) {
-		for (int y=0; y<(int)histogram.back().size(); y++) {
-			cv::Point pt1(x*r_width, y*r_height);
-			cv::Point pt2(x*r_width + r_width, y*r_height + r_height);
-			int c = histogram.at(x).at(y) * 255;
-			cv::rectangle(background, pt1, pt2, cv::Scalar(c, c, c), -1);
+	if(histogram.size() > 0) {
+		cv::Mat background = cv::Mat::zeros(width, height, CV_8UC3);
+		double r_width = width / (double) histogram.size();
+		double r_height = height / (double) histogram.back().size();
+		for (int x=0; x<(int)histogram.size(); x++) {
+			for (int y=0; y<(int)histogram.back().size(); y++) {
+				cv::Point pt1(x*r_width, y*r_height);
+				cv::Point pt2(x*r_width + r_width, y*r_height + r_height);
+				int c = histogram.at(x).at(y) * 255;
+				cv::rectangle(background, pt1, pt2, cv::Scalar(c, c, c), -1);
+			}
 		}
-	}
-	for(;;)
-	{
-		cv::imshow(name, background);
-		if(cv::waitKey(30) >=0) break;
-	}
+		for(;;)
+		{
+			cv::imshow(name, background);
+			if(cv::waitKey(30) >=0) break;
+		}
+	} 
 }
 
 void vPrint(VoxelList v) {
@@ -227,7 +241,7 @@ int main(int argc, char* argv[]) {
 	double ws = 80.0;
 	VoxelList vs = exploreSphere(tree, origin, ws, 13);
 	vPrint(vs);
-	vector <vector <double> > histogram = primaryHistogram(&vs, 3.0, 2.0, M_PI/20, ws, origin);
+	vector <vector <double> > histogram = primaryHistogram(&vs, 3.0, 2.0, 0.1, ws, origin);
 	for (auto i = histogram.begin(); i!=histogram.end(); ++i) {
 		for (auto j = i->begin(); j!=i->end(); ++j) {
 			cout << *j << " ";
