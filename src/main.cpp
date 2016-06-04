@@ -222,12 +222,15 @@ void graph(vector< vector<double> > histogram, const char *name, int width, int 
 			cv::imshow(name, background);
 			if(cv::waitKey(30) >=0) break;
 		}
-	} 
+	}
 }
 
 void vPrint(VoxelList v) {
+	cout << "VList:" << endl;
 	for(auto i = v.begin(); i!=v.end(); ++i) {
-		cout << "P: " << i->oc << ", lambda: " << i->lambda << endl;
+		if (i->oc > 0.5) {
+			printf("X:%f Y:%f Y:%f AZ:%f EL:%f P:%f", i->x, i->y, i->z, i->az, i->el, i->oc);
+		}
 	}
 }
 
@@ -237,16 +240,19 @@ int main(int argc, char* argv[]) {
 	string filename;
 	n.getParam("octomap", filename);
 	OcTree tree(filename + ".bt");
-	cv::Point3d origin(-100.0, 0.0, 0.0);
 	double ws = 80.0;
-	VoxelList vs = exploreSphere(tree, origin, ws, 13);
-	vPrint(vs);
-	vector <vector <double> > histogram = primaryHistogram(&vs, 3.0, 2.0, 0.1, ws, origin);
-	for (auto i = histogram.begin(); i!=histogram.end(); ++i) {
-		for (auto j = i->begin(); j!=i->end(); ++j) {
-			cout << *j << " ";
+	for (double x=-100; x < 100; x+=5) {
+		cv::Point3d origin(x, 0.0, 0.0);
+		VoxelList vs = exploreSphere(tree, origin, ws, 13);
+		vPrint(vs);
+		vector <vector <double> > histogram = primaryHistogram(&vs, 1.0, 1.0, M_PI/20, ws, origin);
+		cout << x << endl;
+		graph(histogram, "Primary histogram", 1000, 600);
+		for (auto i = histogram.begin(); i!=histogram.end(); ++i) {
+			for (auto j = i->begin(); j!=i->end(); ++j) {
+				cout << *j << " ";
+			}
+			cout << endl;
 		}
-		cout << endl;
 	}
-	graph(histogram, "Primary histogram", 1000, 600);
 }
